@@ -523,7 +523,10 @@ app.post("/purchase", function (req, res) {
 app.use('/', express.static(path.join(__dirname, '/')));
 //update profile api
 app.post('/update' ,upload.single('image'), (req,res) => {
-    console.log(req.file.filename);
+    console.log(req.file);
+    if(req.file==undefined){
+        imagename="";
+    }
     let username = req.body.username;
     //fisrt retrieve profile info from user
     db.query(
@@ -537,7 +540,12 @@ app.post('/update' ,upload.single('image'), (req,res) => {
             //else leave value the same
             console.log(myresult);
             let result = Object.assign({}, ...myresult);
-            let image = req.file.filename ==="" ? result.picture : req.file.filename;
+            let image = "";
+            if(req.file ==undefined){
+                image = result.image;
+            }else{
+                image = req.file.filename;
+            }
             let name = req.body.name ==="" ? result.name : req.body.name;
             let email = req.body.email ==="" ? result.email : req.body.email;
             let about = req.body.about ==="" ? result.about : req.body.about;
@@ -549,7 +557,7 @@ app.post('/update' ,upload.single('image'), (req,res) => {
             //update db 
             if(myresult.length>0){
                 db.query(
-                "UPDATE users SET name=?, email= ?, about =?, phoneNum=?, address=?, country=?, picture=? WHERE email=?",
+                "UPDATE users SET name=?, email= ?, about =?, phoneNum=?, address=?, country=?, birthday=?, city=?, picture=? WHERE email=?",
                 [name,email,about,phone,address,country,birthday,city,image,username],
                 (err, result1) => {
                 if (result1){    
